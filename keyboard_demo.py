@@ -1,6 +1,7 @@
 from pynput import keyboard  # 键盘监听主库 main keyboard listening library
 import time                  # 获取时间戳 get timestamp
-import json                  # 把事件字典转成 JSON 字符串（可选）transform event dict to JSON string (optional)
+import json                 # 把事件字典转成 JSON 字符串（可选）transform event dict to JSON string (optional)
+import sys                 # 退出程序 exit program
 
 pressed_keys = set()   # 记录当前已经按下、尚未松开的键 record currently pressed keys
 LOG_FILE = f"key_events/key_events_{int(time.time()*1000)}.jsonl"  #日志文件路径 log file pathpython keyboard_demo.py
@@ -76,8 +77,16 @@ def start_keyboard_listener():
             ) as listener:
         listener.join()
 
-# 主程序入口 main program entry point
-if __name__ == "__main__":
-    print("Starting keyboard listener. Press ESC to stop.")
+def main():
+    #global SAVE_EVENTS
+    # 如果命令行里带了 --save，就开启保存；否则不保存
+    # turn on saving when '--save' appears in command line args
+    #SAVE_EVENTS = ("--save" in sys.argv)
+
+    print(f"Starting keyboard listener. SAVE_EVENTS={SAVE_EVENTS}. Press ESC to stop.")
     start_keyboard_listener()
     print("Keyboard listener stopped.")
+
+# 主程序入口 main program entry point
+if __name__ == "__main__":
+    main()
