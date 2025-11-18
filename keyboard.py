@@ -5,7 +5,7 @@ import sys                 # 退出程序 exit program
 
 pressed_keys = set()   # 记录当前已经按下、尚未松开的键 record currently pressed keys
 LOG_FILE = f"key_events/key_events_{int(time.time()*1000)}.jsonl"  #日志文件路径 log file pathpython keyboard_demo.py
-SAVE_EVENTS = False # 保存时设 True，不保存设 False     save to file if True, else not
+SAVE_EVENTS = True # 保存时设 True，不保存设 False     save to file if True, else not
 
 def save_event(event):
     """把事件追加写入文件（一行一个 JSON 字符串）write event to file as JSON string, one per line"""
@@ -64,18 +64,19 @@ def on_release(key):
     print(event)
 
     save_event(event)#保存到文件 save to file
+
 def start_keyboard_listener():
-    """启动键盘监听器 start keyboard listener"""
-    with keyboard.Listener(
-            on_press=on_press,
-            on_release=on_release,
-            # 如果想把键盘事件“吃掉”，不传递给其他应用，设置 suppress=True；
-            # If you want to "suppress" keyboard events so other apps don't receive them, set suppress=True;
-            # 如果想让其他应用也能收到事件，设置为suppress=False。设置为True是为了终端不打印出来。
-            # If you want other apps to receive the events, set suppress=False. Setting it to True prevents printing in the terminal.
-            suppress=True
-            ) as listener:
-        listener.join()
+    listener = keyboard.Listener(
+        on_press=on_press,
+        on_release=on_release,
+        # 如果想把键盘事件“吃掉”，不传递给其他应用，设置 suppress=True；
+        # If you want to "suppress" keyboard events so other apps don't receive them, set suppress=True;
+        # 如果想让其他应用也能收到事件，设置为suppress=False。设置为True是为了终端不打印出来。
+        # If you want other apps to receive the events, set suppress=False. Setting it to True prevents printing in the terminal.
+        suppress=True
+    )
+    listener.start()   # 不阻塞
+    return listener
 
 def main():
     #global SAVE_EVENTS
@@ -84,7 +85,7 @@ def main():
     #SAVE_EVENTS = ("--save" in sys.argv)
 
     print(f"Starting keyboard listener. SAVE_EVENTS={SAVE_EVENTS}. Press ESC to stop.")
-    start_keyboard_listener()
+    
     print("Keyboard listener stopped.")
 
 # 主程序入口 main program entry point

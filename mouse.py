@@ -7,7 +7,7 @@ from dataclasses import dataclass
 from typing import Optional, Literal
 
 mouse_listener = None 
-SAVE_EVENTS = False  # 保存时设 True，不保存设 False
+SAVE_EVENTS = True # 保存时设 True，不保存设 False
 LOG_FILE = f"mouse_events/mouse_events_{int(time.time()*1000)}.jsonl"  #日志文件路径 log file path
 
 def save_event(event):
@@ -37,17 +37,17 @@ def handle_event(event_type: str, **kwargs) -> None:
     print(event)
     save_event(event)  #保存到文件 save to file
 
-def on_move(x: int, y: int) -> None:
+def on_move(x: float, y: float) -> None:
     """鼠标移动时由 Listener 调用。"""
     ts = get_timestamp()
     handle_event('move', x=x, y=y, ts=ts)
 
-def on_click(x: int, y: int, button, pressed: bool) -> None:
+def on_click(x: float, y: float, button, pressed: bool) -> None:
     """鼠标按下/弹起时由 Listener 调用。"""
     ts = get_timestamp()
     handle_event('click', x=x, y=y, button=str(button), pressed=pressed, ts=ts)
 
-def on_scroll(x: int, y: int, dx: int, dy: int) -> None:
+def on_scroll(x: float, y: float, dx: float, dy: float) -> None:
     """滚轮滚动时由 Listener 调用。"""
     ts = get_timestamp()
     handle_event('scroll', x=x, y=y, dx=dx, dy=dy, ts=ts)   
@@ -65,28 +65,17 @@ def on_key_press(key):
         print(f"Error in on_key_press: {e}")
 
 
-def run_mouse_listener() -> None:
-    """
-    创建 mouse.Listener 和 keyboard.Listener：
-    - 鼠标监听负责捕获鼠标事件
-    - 键盘监听负责检测 ESC，用于优雅退出
-    """
+def start_mouse_listener():
     global mouse_listener
-
-    # 1. 创建并启动鼠标监听（后台线程）
     mouse_listener = mouse.Listener(
         on_move=on_move,
         on_click=on_click,
         on_scroll=on_scroll
     )
     mouse_listener.start()
+    return mouse_listener
 
-    # 2. 主线程阻塞在键盘监听上，直到按下 ESC
-    with keyboard.Listener(on_press=on_key_press) as key_listener:
-        key_listener.join()
-
-    print("Mouse and keyboard listeners stopped. Bye.")
 
 
 if __name__ == "__main__":
-    run_mouse_listener()
+    start_mouse_listener()
